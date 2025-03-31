@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Signup Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .date-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-group input {
+            flex: 1;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .row>div {
+            flex: 1;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+
+            .date-group {
+                flex-direction: column;
+            }
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            <h1>Signup Form</h1>
+
+            <!-- Personal Details -->
+            <h2>Full Name</h2>
+            <div class="form-group">
+                <input type="text" required>
+            </div>
+
+            <h2>Date of Birth</h2>
+            <div class="date-group">
+                <input type="text" placeholder="dd" maxlength="2" required>
+                <input type="text" placeholder="mm" maxlength="2" required>
+                <input type="text" placeholder="yyyy" maxlength="4" required>
+            </div>
+
+            <h2>Gender</h2>
+            <div class="form-group">
+                <select required>
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <h2>Address</h2>
+            <div class="form-group">
+                <textarea required></textarea>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="row">
+                <div>
+                    <h2>Phone Number</h2>
+                    <div class="form-group">
+                        <input type="tel" required>
+                    </div>
+                </div>
+                <div>
+                    <h2>Email ID</h2>
+                    <div class="form-group">
+                        <input type="email" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Details -->
+            <h2>Employee ID</h2>
+            <div class="form-group">
+                <input type="number" required>
+            </div>
+
+            <h2>Date of Joining</h2>
+            <div class="date-group">
+                <input type="text" placeholder="dd" maxlength="2" required>
+                <input type="text" placeholder="mm" maxlength="2" required>
+                <input type="text" placeholder="yyyy" maxlength="4" required>
+            </div>
+
+            <div class="row">
+                <div>
+                    <h2>Role</h2>
+                    <div class="form-group">
+                        <input type="text" value="Admin" readonly>
+                    </div>
+                </div>
+                <div>
+                    <h2>Branch</h2>
+                    <div class="form-group">
+                        <select required>
+                            <option value="">Select Branch</option>
+                            <option>Main Branch</option>
+                            <option>North Branch</option>
+                            <option>South Branch</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+    </div>
+    <script>
+
+
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                fullName: document.querySelector('input[type="text"]').value,
+                dobDay: parseInt(document.querySelectorAll('.date-group input')[0].value),
+                dobMonth: parseInt(document.querySelectorAll('.date-group input')[1].value),
+                dobYear: parseInt(document.querySelectorAll('.date-group input')[2].value),
+                gender: document.querySelector('select').value,
+                address: document.querySelector('textarea').value,
+                phoneNumber: document.querySelector('input[type="tel"]').value,
+                email: document.querySelector('input[type="email"]').value,
+                employeeId: parseInt(document.querySelector('input[type="number"]').value),
+                dojDay: parseInt(document.querySelectorAll('.date-group input')[3].value),
+                dojMonth: parseInt(document.querySelectorAll('.date-group input')[4].value),
+                dojYear: parseInt(document.querySelectorAll('.date-group input')[5].value),
+                branch: document.querySelectorAll('select')[1].value
+            };
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Signup successful! Employee ID: ' + result.employeeId);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('An error occurred: ' + error.message);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
