@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.demo.auth.dto.LoginRequest;
 import com.example.demo.auth.dto.SignupRequest;
 import com.example.demo.auth.model.Employee;
 import com.example.demo.auth.repository.EmployeeRepository;
@@ -46,5 +46,16 @@ public class EmployeeService {
         employee.setBranch(request.getBranch());
         employee.setPassword(request.getPassword());
         return employeeRepository.save(employee);
+    }
+    public Employee authenticate(LoginRequest loginRequest) {
+        Employee employee = employeeRepository.findByEmployeeId(loginRequest.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        
+        // Plain text comparison (not secure)
+        if (!loginRequest.getPassword().equals(employee.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+        
+        return employee;
     }
 }

@@ -1,52 +1,66 @@
-function validateLogin() {
-    let loginData = {
-        email: document.getElementById("employeeId").value,
-        password: document.getElementById("password").value
-    };
 
-    fetch("/api/users/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(loginData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === "Login successful") {
-            window.location.href = getRoleRedirectPage();
-        } else {
-            document.getElementById("loginError").style.display = "block";
+async function validateLogin() {
+    const employeeId = document.getElementById('employeeId').value.trim();
+    const password = document.getElementById('password').value;
+    const errorElement = document.getElementById('loginError');
+    
+    // Hide previous errors
+    errorElement.style.display = 'none';
+    
+    // Basic validation
+    if (!employeeId || !password) {
+        showError('Please enter both Employee ID and Password');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:6060/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                employeeId: employeeId,
+                password: password
+            })
+        });
+
+        // First check if response is OK (status 200-299)
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-    })
-    .catch(error => console.error("Error:", error));
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            // Successful login - redirect based on role
+            if (data.role === 'Admin') {
+                window.location.href = './admin.html';
+            } else {
+                window.location.href = './login.html';
+            }
+        } else {
+            showError(data.message || 'Invalid credentials');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('Login failed. Please try again.');
+    }
+}
+
+function showError(message) {
+    const errorElement = document.getElementById('loginError');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
 }
 
 function forgotPassword() {
-    alert("Redirecting to forgot password page...");
+    alert('Forgot password functionality will be implemented here');
 }
 
-function getQueryParam(param) {
-    let urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-function redirectToDashboard(role) {
-    if (role === "Billing Desk") {
-        window.location.href = "billing.html";
-    } else if (role === "Admin") {
-        window.location.href = "admin.html";
-    } else if (role === "Sales Person") {
-        window.location.href = "sales.html";
-    } else {
-        alert("Invalid role selection.");
+// Handle form submission on Enter key
+document.getElementById('loginForm').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        validateLogin();
     }
-}
-
-window.onload = function () {
-    let roleParam = getQueryParam("role");
-    let roleDisplay = document.getElementById("roleDisplay");
-    if (roleParam) {
-        roleDisplay.textContent = `Logging in as: ${decodeURIComponent(roleParam)}`;
-    }
-};
+});
