@@ -1,12 +1,13 @@
 package com.example.demo.auth.service;
 
-import com.example.demo.auth.dto.SignupRequest;
-import com.example.demo.auth.model.Employee;
-import com.example.demo.auth.repository.EmployeeRepository;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import com.example.demo.auth.dto.SignupRequest;
+import com.example.demo.auth.model.Employee;
+import com.example.demo.auth.repository.EmployeeRepository;
 
 @Service
 public class EmployeeService {
@@ -43,7 +44,7 @@ public class EmployeeService {
             request.getDojDay()
         ));
         employee.setBranch(request.getBranch());
-
+        employee.setPassword(request.getPassword());
         return employeeRepository.save(employee);
     }
 }
