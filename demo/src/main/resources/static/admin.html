@@ -4,8 +4,248 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 15%;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li:hover, .active {
+            background-color: #2563eb;
+        }
+
+        .content {
+            width: 85%;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .content h1 {
+            font-size: 24px;
+        }
+
+        .content p {
+            margin-top: 10px;
+            color: #555;
+        }
+
+        /* Inventory Table Styles */
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .inventory-table th, .inventory-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: xx-small;
+        }
+
+        .inventory-table th {
+            background-color: #007BFF;
+            font-size: xx-small;
+            color: white;
+        }
+        
+        .inventory-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .inventory-table tr:hover {
+            background-color: #ddd;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .export-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .approve-btn {
+            background-color: #4CAF50;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .reject-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        form {
+            font-size: xx-small;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .insert-btn, .delete-confirm-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Section Visibility */
+        .dashboard-section {
+            display: block;
+        }
+
+        .user-section, .report-section, .settings-section {
+            display: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-table, .print-table * {
+                visibility: visible;
+            }
+            .print-table {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .action-buttons {
+                display: none;
+            }
+        }
+
+        /* Existing Report Tables */
+        .report-table, .team-table, .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-table th, .report-table td,
+        .team-table th, .team-table td,
+        .user-table th, .user-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .report-table th, .team-table th, .user-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+        
+        .report-table tr:nth-child(even),
+        .team-table tr:nth-child(even),
+        .user-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .report-table tr:hover,
+        .team-table tr:hover,
+        .user-table tr:hover {
+            background-color: #ddd;
+        }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -15,6 +255,15 @@
             <li onclick="showSection('users')">Users</li>
             <li onclick="showSection('reports')">Reports</li>
             <li onclick="showSection('settings')">Settings</li>
+            <a href="cmd.html" target="new" 
+            style="color: white;
+            text-decoration: none; font-size: small;
+           
+            "><img 
+            src="https://cdn.iconscout.com/icon/premium/png-256-thumb/command-prompt-1623650-1374946.png"
+            width="50px"
+            height="50px"
+            style="margin-top: 100px;"></a>
         </ul>
     </div>
 
@@ -22,8 +271,79 @@
         <h1 id="section-title">Dashboard</h1>
         <p id="section-content">Welcome to the Admin Dashboard! Here you can manage the entire system.</p>
 
-        <!-- Dashboard Section -->
-        <div id="dashboard" class="report-section">
+        <!-- Dashboard Section (Inventory) -->
+        <div id="dashboard" class="dashboard-section">
+            <h2>Inventory Dashboard</h2>
+            <p>Manage your inventory items</p>
+            
+            <table class="inventory-table print-table">
+                <thead>
+                    <tr>
+                        <th>SNO</th>
+                        <th>Product</th>
+                        <th>Material</th>
+                        <th>Color</th>
+                        <th>Qty</th>
+                        <th>Blouse</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Disc%</th>
+                        <th>Sell</th>
+                        <th>Barcode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Cotton Silk</td>
+                        <td>Cotton Silk</td>
+                        <td>Blue</td>
+                        <td>21</td>
+                        <td>No</td>
+                        <td>28-01-24</td>
+                        <td>15074.30</td>
+                        <td>26.63</td>
+                        <td>11060.01</td>
+                        <td>BAR415907</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Tussar Silk</td>
+                        <td>Tussar Silk</td>
+                        <td>Silver</td>
+                        <td>45</td>
+                        <td>Yes</td>
+                        <td>22-12-24</td>
+                        <td>9806.83</td>
+                        <td>29.45</td>
+                        <td>6918.72</td>
+                        <td>BAR956606</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Kanchipuram</td>
+                        <td>Kanchipuram</td>
+                        <td>Purple</td>
+                        <td>32</td>
+                        <td>No</td>
+                        <td>03-07-24</td>
+                        <td>17860.01</td>
+                        <td>24.48</td>
+                        <td>13487.88</td>
+                        <td>BAR288814</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="action-buttons">
+                <button id="addBtn" class="add-btn">Add</button>
+                <button id="deleteBtn" class="delete-btn">Delete</button>
+                <button id="exportBtn" class="export-btn">Export</button>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="report-section">
             <h2>Stock Information - Sarees</h2>
             <table class="report-table">
                 <thead>
@@ -35,10 +355,10 @@
                     </tr>
                 </thead>
                 <tbody id="report-data">
+                    <!-- Data will be loaded from JavaScript -->
                 </tbody>
             </table>
 
-            <!-- Team Members Levels -->
             <h2>Team Members Levels</h2>
             <table class="team-table">
                 <thead>
@@ -48,12 +368,13 @@
                     </tr>
                 </thead>
                 <tbody id="team-levels">
+                    <!-- Data will be loaded from JavaScript -->
                 </tbody>
             </table>
         </div>
 
         <!-- Users Section -->
-        <div id="users" class="user-section" style="display: none;">
+        <div id="users" class="user-section">
             <h2>Approved Members</h2>
             <table class="user-table" id="approved-users">
                 <thead>
@@ -64,6 +385,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Data will be loaded from JavaScript -->
                 </tbody>
             </table>
 
@@ -78,11 +400,396 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Data will be loaded from JavaScript -->
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <script src="js/admin.js"></script>
+        <!-- Settings Section -->
+        <div id="settings" class="settings-section">
+            <h2>System Settings</h2>
+            <p>Configure system preferences and options</p>
+        </div>
+    </div>
+    
+    <!-- Add Item Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Item</h3>
+            <form id="addForm">
+                <div class="form-group">
+                    <label for="product">Product:</label>
+                    <input type="text" id="product" name="product" required>
+                </div>
+                <div class="form-group">
+                    <label for="material">Material:</label>
+                    <input type="text" id="material" name="material" required>
+                </div>
+                <div class="form-group">
+                    <label for="color">Color:</label>
+                    <input type="text" id="color" name="color" required>
+                </div>
+                <div class="form-group">
+                    <label for="qty">Qty:</label>
+                    <input type="number" id="qty" name="qty" required>
+                </div>
+                <div class="form-group">
+                    <label for="blouse">Blouse:</label>
+                    <select id="blouse" name="blouse" required>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="number" step="0.01" id="price" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label for="discount">Disc%:</label>
+                    <input type="number" step="0.01" id="discount" name="discount" required>
+                </div>
+                <div class="form-group">
+                    <label for="sell">Sell:</label>
+                    <input type="number" step="0.01" id="sell" name="sell" required>
+                </div>
+                <div class="form-group">
+                    <label for="barcode">Barcode:</label>
+                    <input type="text" id="barcode" name="barcode" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" id="cancelAddBtn" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="insert-btn">Insert</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Delete Item Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Item</h3>
+            <form id="deleteForm">
+                <div class="form-group">
+                    <label for="barcodeSelect">Select Barcode:</label>
+                    <select id="barcodeSelect" name="barcodeSelect" required>
+                        <option value="">-- Select Barcode --</option>
+                        <option value="BAR415907">BAR415907</option>
+                        <option value="BAR956606">BAR956606</option>
+                        <option value="BAR288814">BAR288814</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" id="cancelDeleteBtn" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="delete-confirm-btn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Data from your admin.js
+        const stockData = {
+            total: 325,
+            sold: 215,
+            remaining: 110,
+            revenue: 267999,
+        };
+
+        const teamLevels = {
+            "Junior Members [L1]": 2,
+            "Mid-Level Members [L2]": 4,
+            "Senior Members [L3]": 3,
+            "Team Leads [L4]": 1,
+        };
+
+        let approvedUsers = [
+            { name: "Alice Johnson", email: "alice@example.com", role: "L1" },
+            { name: "Bob Williams", email: "bob@example.com", role: "L1" },
+            { name: "Williams", email: "Williams@example.com", role: "L2" },
+            { name: "Henry", email: "Henry@example.com", role: "L2" },
+            { name: "Peter", email: "Peter@example.com", role: "L2" },
+            { name: "Sophia", email: "Sophia@example.com", role: "L2" },
+            { name: "Laila", email: "Laila@example.com", role: "L3" },
+            { name: "Lerry", email: "lerry@example.com", role: "L3" },
+            { name: "Micheal", email: "Micheal@example.com", role: "L3" },
+            { name: "Trimmson", email: "Trimmson@example.com", role: "L4" },
+        ];
+
+        let pendingUsers = [
+            { name: "Charlie Brown", email: "charlie@example.com", role: "L1" },
+            { name: "Diana Green", email: "diana@example.com", role: "L3" }
+        ];
+
+        // Section Navigation
+        function showSection(section) {
+            document.getElementById("section-title").textContent = section.charAt(0).toUpperCase() + section.slice(1);
+            document.getElementById("section-content").textContent = "";
+            
+            let sections = document.querySelectorAll(".dashboard-section, .user-section, .report-section, .settings-section");
+            sections.forEach(sec => sec.style.display = "none");
+            
+            if (section === "dashboard") {
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("section-content").textContent = "Welcome to the Admin Dashboard! Here you can manage the entire system.";
+            } else if (section === "reports") {
+                document.getElementById("reports").style.display = "block";
+                document.getElementById("section-content").textContent = "View system reports";
+                loadStockReports();
+                loadTeamLevels();
+            } else if (section === "users") {
+                document.getElementById("users").style.display = "block";
+                document.getElementById("section-content").textContent = "Manage system users";
+                loadUsers();
+            } else if (section === "settings") {
+                document.getElementById("settings").style.display = "block";
+                document.getElementById("section-content").textContent = "System configuration";
+            }
+            
+            let items = document.querySelectorAll(".sidebar ul li");
+            items.forEach(item => item.classList.remove("active"));
+            event.currentTarget.classList.add("active");
+        }
+
+        function loadStockReports() {
+            const reportTable = document.getElementById("report-data");
+            reportTable.innerHTML = "";
+
+            let row = `<tr>
+                <td>${stockData.total}</td>
+                <td>${stockData.sold}</td>
+                <td>${stockData.remaining}</td>
+                <td>₹${stockData.revenue.toLocaleString()}</td>
+            </tr>`;
+            reportTable.innerHTML += row;
+        }
+
+        function loadTeamLevels() {
+            const teamTable = document.getElementById("team-levels");
+            teamTable.innerHTML = "";
+
+            for (const level in teamLevels) {
+                let row = `<tr>
+                    <td>${level}</td>
+                    <td>${teamLevels[level]}</td>
+                </tr>`;
+                teamTable.innerHTML += row;
+            }
+        }
+
+        function loadUsers() {
+            const approvedTable = document.getElementById("approved-users").querySelector("tbody");
+            const pendingTable = document.getElementById("pending-users").querySelector("tbody");
+
+            approvedTable.innerHTML = "";
+            pendingTable.innerHTML = "";
+
+            approvedUsers.forEach(user => {
+                let row = <tr><td>${user.name}</td><td>${user.email}</td><td>${user.role}</td></tr>;
+                approvedTable.innerHTML += row;
+            });
+
+            pendingUsers.forEach((user, index) => {
+                let row = `<tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>
+                        <button class="approve-btn" onclick="approveUser(${index})">Approve</button>
+                        <button class="reject-btn" onclick="rejectUser(${index})">Reject</button>
+                    </td>
+                </tr>`;
+                pendingTable.innerHTML += row;
+            });
+        }
+
+        function approveUser(index) {
+            approvedUsers.push(pendingUsers[index]);
+            pendingUsers.splice(index, 1);
+            loadUsers();
+            alert("User approved successfully!");
+        }
+
+        function rejectUser(index) {
+            pendingUsers.splice(index, 1);
+            loadUsers();
+            alert("User rejected!");
+        }
+
+        // Inventory functionality
+        const addBtn = document.getElementById('addBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const addModal = document.getElementById('addModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelAddBtn = document.getElementById('cancelAddBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const addForm = document.getElementById('addForm');
+        const deleteForm = document.getElementById('deleteForm');
+        const inventoryTable = document.querySelector('.inventory-table tbody');
+        
+        // Modal functionality
+        addBtn.addEventListener('click', () => {
+            addModal.style.display = 'block';
+        });
+        
+        deleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'block';
+        });
+        
+        // Export functionality
+        exportBtn.addEventListener('click', () => {
+            window.print();
+        });
+        
+        cancelAddBtn.addEventListener('click', () => {
+            addModal.style.display = 'none';
+            addForm.reset();
+        });
+        
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+            deleteForm.reset();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === addModal) {
+                addModal.style.display = 'none';
+                addForm.reset();
+            }
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+                deleteForm.reset();
+            }
+        });
+        
+        // Form submission for adding new item
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get all form values
+            const product = document.getElementById('product').value;
+            const material = document.getElementById('material').value;
+            const color = document.getElementById('color').value;
+            const qty = document.getElementById('qty').value;
+            const blouse = document.getElementById('blouse').value;
+            const date = document.getElementById('date').value;
+            const price = document.getElementById('price').value;
+            const discount = document.getElementById('discount').value;
+            const sell = document.getElementById('sell').value;
+            const barcode = document.getElementById('barcode').value;
+            
+            // Check if all fields are filled
+            if (product && material && color && qty && blouse && date && price && discount && sell && barcode) {
+                // Format date as DD-MM-YY
+                const formattedDate = formatDate(date);
+                
+                // Create new table row
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${inventoryTable.rows.length + 1}</td>
+                    <td>${product}</td>
+                    <td>${material}</td>
+                    <td>${color}</td>
+                    <td>${qty}</td>
+                    <td>${blouse}</td>
+                    <td>${formattedDate}</td>
+                    <td>${parseFloat(price).toFixed(2)}</td>
+                    <td>${parseFloat(discount).toFixed(2)}</td>
+                    <td>${parseFloat(sell).toFixed(2)}</td>
+                    <td>${barcode}</td>
+                `;
+                
+                // Add the new row to the table
+                inventoryTable.appendChild(newRow);
+                
+                // Add the new barcode to the delete dropdown
+                const barcodeSelect = document.getElementById('barcodeSelect');
+                const newOption = document.createElement('option');
+                newOption.value = barcode;
+                newOption.textContent = barcode;
+                barcodeSelect.appendChild(newOption);
+                
+                // Show success message
+                alert('Inventory updated successfully!');
+                
+                // Close modal and reset form
+                addModal.style.display = 'none';
+                addForm.reset();
+            } else {
+                // Show error message if any field is empty
+                alert('Failed to update inventory. Please fill all fields.');
+            }
+        });
+        
+        // Form submission for deleting item
+        deleteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const barcode = document.getElementById('barcodeSelect').value;
+            
+            if (barcode) {
+                // Find and remove the row with matching barcode
+                const rows = inventoryTable.querySelectorAll('tr');
+                let found = false;
+                
+                rows.forEach(row => {
+                    if (row.cells[10].textContent === barcode) {
+                        row.remove();
+                        found = true;
+                    }
+                });
+                
+                // Remove the barcode from the dropdown
+                const barcodeSelect = document.getElementById('barcodeSelect');
+                const options = barcodeSelect.querySelectorAll('option');
+                
+                options.forEach(option => {
+                    if (option.value === barcode) {
+                        option.remove();
+                    }
+                });
+                
+                if (found) {
+                    alert('Item deleted successfully!');
+                    
+                    // Update SNO for all remaining rows
+                    const updatedRows = inventoryTable.querySelectorAll('tr');
+                    updatedRows.forEach((row, index) => {
+                        row.cells[0].textContent = index + 1;
+                    });
+                } else {
+                    alert('Item not found!');
+                }
+                
+                // Close modal and reset form
+                deleteModal.style.display = 'none';
+                deleteForm.reset();
+            } else {
+                alert('Please select a barcode to delete.');
+            }
+        });
+        
+        // Helper function to format date as DD-MM-YY
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return ${day}-${month}-${year};
+        }
+
+        // Initialize the page with Dashboard section visible and load data
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('dashboard');
+            loadStockReports();
+            loadTeamLevels();
+            loadUsers();
+        });
+    </script>
 </body>
 </html>
