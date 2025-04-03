@@ -285,6 +285,22 @@
             to { transform: rotate(360deg); }
         }
         
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+        
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 600px) {
             .container {
@@ -522,6 +538,10 @@
                 </div>
             </div>
         </form>
+        
+        <div class="login-link">
+            Already registered? <a href="login.html">Login here</a>
+        </div>
     </div>
 
     <script>
